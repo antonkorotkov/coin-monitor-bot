@@ -30,6 +30,11 @@ class InlinePaginationKeyboard {
     /**
      * @type {number}
      */
+    #maxVisiblePages;
+
+    /**
+     * @type {number}
+     */
     #currentPage = 0;
 
     /**
@@ -37,20 +42,38 @@ class InlinePaginationKeyboard {
      */
     #totalPages;
 
+    /**
+     * @type {(i: Item) => string}
+     */
     #renderItem;
 
     /**
-     * @param {Item[]} items
      * @param {{ perPage?: number, renderItem: (i: Item) => string }} options
      */
-    constructor(items, options) {
-        const { perPage = 5, renderItem } = options;
+    constructor(options) {
+        const { perPage = 5, maxVisiblePages = 5, renderItem } = options;
 
         this.#renderItem = renderItem;
-        this.#items = items;
         this.#perPage = perPage;
+        this.#maxVisiblePages = maxVisiblePages;
+    }
+
+    init(bot) {
+        bot.on("callback_query:data", async (ctx) => {
+            console.log("Unknown button event with payload", ctx.callbackQuery.data);
+            await ctx.answerCallbackQuery(); // remove loading animation
+        });
+
+        return this;
+    }
+
+    /**
+     * @param {Item[]} items
+     */
+    setItems(items) {
+        this.#items = items;
         this.#totalItems = items.length - 1;
-        this.#totalPages = Math.ceil(this.#totalItems/perPage);
+        this.#totalPages = Math.ceil(this.#totalItems/this.#perPage);
     }
 
     #getPageItems() {
@@ -77,10 +100,11 @@ class InlinePaginationKeyboard {
         return this;
     }
 
-    #generatePagination(currentPage, totalPages, maxVisiblePages = 5) {
+    #generatePagination() {
         const pagination = [];
+        const current = this.#currentPage + 1;
 
-        if (currentPage > 1) {
+        if (current > 1) {
             pagination.push({
                 type: 'first',
                 page: 1
@@ -88,26 +112,23 @@ class InlinePaginationKeyboard {
         }
 
         // Calculate the start and end of the visible page range
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        let startPage = Math.max(1, current - Math.floor(this.#maxVisiblePages / 2));
+        const endPage = Math.min(this.#totalPages, startPage + this.#maxVisiblePages - 1);
 
-        // Adjust the start page if end page is less than max visible pages
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        startPage = Math.max(1, endPage - this.#maxVisiblePages + 1);
 
-        // Add page buttons
         for (let i = startPage; i <= endPage; i++) {
             pagination.push({
                 type: 'page',
                 page: i,
-                current: i === currentPage
+                current: i === current
             });
         }
 
-        // Add "Last" button
-        if (currentPage < totalPages) {
+        if (current < this.#totalPages) {
             pagination.push({
                 type: 'last',
-                page: totalPages
+                page: this.#totalPages
             });
         }
 
@@ -125,15 +146,15 @@ class InlinePaginationKeyboard {
         });
 
         if (this.#totalPages > 1) {
-            const pagination = this.#generatePagination(this.#currentPage + 1, this.#totalPages);
+            const pagination = this.#generatePagination();
 
             this.#keyboard.row();
             pagination.forEach(p => {
                 if (p.type === 'first')
-                    this.#keyboard.text('«');
+                    this.#keyboard.text('« 1');
 
                 if (p.type === 'last')
-                    this.#keyboard.text('»');
+                    this.#keyboard.text(`${this.#totalPages} »`);
 
                 if (p.type === 'page')
                     this.#keyboard.text(p.page);

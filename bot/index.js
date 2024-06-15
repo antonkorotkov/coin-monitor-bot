@@ -32,7 +32,7 @@ const initialize = () => {
     bot.use(session({ initial: () => ({}) }));
     bot.use(conversations());
 
-    allConversations.forEach(c => bot.use(createConversation(c({ marketsCollection }))));
+    allConversations.forEach(c => bot.use(createConversation(c({ marketsCollection, bot }))));
 
     bot.command('start', start);
     bot.command('search', search);
