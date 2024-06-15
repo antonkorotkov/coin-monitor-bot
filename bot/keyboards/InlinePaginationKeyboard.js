@@ -64,7 +64,7 @@ class InlinePaginationKeyboard {
         this.#maxVisiblePages = maxVisiblePages;
     }
 
-    init(bot) {
+    init(bot, onItemClick) {
         bot.on("callback_query:data", async (ctx) => {
             if (ctx.callbackQuery.data.includes('pagination:')) {
                 const [, page] = ctx.callbackQuery.data.split(':');
@@ -79,7 +79,8 @@ class InlinePaginationKeyboard {
                 }
             }
             else if (ctx.callbackQuery.data.includes('itemClick:')) {
-                await ctx.reply(ctx.callbackQuery.data);
+                const [, itemId] = ctx.callbackQuery.data.split(':');
+                onItemClick(itemId, ctx);
             }
 
             await ctx.answerCallbackQuery();
@@ -99,7 +100,8 @@ class InlinePaginationKeyboard {
     }
 
     #getPageItems() {
-        return this.#items.slice(this.#currentPage, this.#currentPage + this.#perPage);
+        const start = this.#currentPage * this.#perPage;
+        return this.#items.slice(start, start + this.#perPage);
     }
 
     #setCurrent(page) {
@@ -111,18 +113,18 @@ class InlinePaginationKeyboard {
         const pagination = [];
         const current = this.#currentPage + 1;
 
-        if (current > Math.ceil(this.#maxVisiblePages / 2)) {
-            pagination.push({
-                type: 'first',
-                page: 1
-            });
-        }
-
         // Calculate the start and end of the visible page range
         let startPage = Math.max(1, current - Math.floor(this.#maxVisiblePages / 2));
         const endPage = Math.min(this.#totalPages, startPage + this.#maxVisiblePages - 1);
 
         startPage = Math.max(1, endPage - this.#maxVisiblePages + 1);
+
+        if (this.#totalPages > this.#maxVisiblePages && current > Math.ceil(this.#maxVisiblePages / 2)) {
+            pagination.push({
+                type: 'first',
+                page: 1
+            });
+        }
 
         for (let i = startPage; i <= endPage; i++) {
             pagination.push({
@@ -132,7 +134,7 @@ class InlinePaginationKeyboard {
             });
         }
 
-        if (this.#totalPages - current > Math.floor(this.#maxVisiblePages / 2)) {
+        if (this.#totalPages > this.#maxVisiblePages && this.#totalPages - current > Math.floor(this.#maxVisiblePages / 2)) {
             pagination.push({
                 type: 'last',
                 page: this.#totalPages

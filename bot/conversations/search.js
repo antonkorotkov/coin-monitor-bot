@@ -6,7 +6,14 @@ const paginatedResponseKeyboard = new InlinePaginationKeyboard({
 });
 
 module.exports = globalCtx => {
-    paginatedResponseKeyboard.init(globalCtx.bot);
+    paginatedResponseKeyboard.init(globalCtx.bot, async (coin, ctx) => {
+        const market = globalCtx.marketsCollection.getMarketByCoin(coin);
+
+        if (!market)
+            return await ctx.reply('Currency not found or not available anymore');
+
+        await ctx.reply(market.getPrice());
+    });
 
     return async function searchConversation(conversation, ctx) {
         await ctx.reply('Enter the name or code of the crypto currency to search for:');

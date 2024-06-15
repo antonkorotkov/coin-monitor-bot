@@ -49,7 +49,7 @@ module.exports = class MarketCollection {
 
             console.log('received markets data', marketsData.length);
 
-            marketsData.forEach(marketData => {
+            marketsData.sort((a, b) => a.Name.localeCompare(b.Name)).forEach(marketData => {
                 const foundIndex = this.#markets.findIndex(m => m.getName() === marketData.Name);
 
                 if (foundIndex >= 0) {
@@ -88,5 +88,13 @@ module.exports = class MarketCollection {
         return this.#markets.filter(
             market => market.getName().toLowerCase().includes(searchPhrase) || market.getCoin().toLowerCase().includes(searchPhrase)
         );
+    }
+
+    /**
+     * @param {string} coin
+     * @returns {Market}
+     */
+    getMarketByCoin(coin) {
+        return this.#markets.find(m => m.getCoin() === coin);
     }
 }
