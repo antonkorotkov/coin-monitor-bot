@@ -48,12 +48,18 @@ class InlinePaginationKeyboard {
     #renderItem;
 
     /**
-     * @param {{ perPage?: number, renderItem: (i: Item) => string }} options
+     * @type {(i: Item) => string}
+     */
+    #resolveItemId;
+
+    /**
+     * @param {{ perPage?: number, renderItem: (i: Item) => string; resolveItemId: (i: Item) => string }} options
      */
     constructor(options) {
-        const { perPage = 5, maxVisiblePages = 5, renderItem } = options;
+        const { perPage = 5, maxVisiblePages = 5, renderItem, resolveItemId } = options;
 
         this.#renderItem = renderItem;
+        this.#resolveItemId = resolveItemId;
         this.#perPage = perPage;
         this.#maxVisiblePages = maxVisiblePages;
     }
@@ -67,10 +73,13 @@ class InlinePaginationKeyboard {
                 if (pageNumber !== this.#currentPage) {
                     this.#setCurrent(pageNumber);
 
-                    ctx.editMessageReplyMarkup({
+                    await ctx.editMessageReplyMarkup({
                         reply_markup: this.getMarkup()
                     });
                 }
+            }
+            else if (ctx.callbackQuery.data.includes('itemClick:')) {
+                await ctx.reply(ctx.callbackQuery.data);
             }
 
             await ctx.answerCallbackQuery();
@@ -140,7 +149,7 @@ class InlinePaginationKeyboard {
         this.#keyboard = new InlineKeyboard();
 
         this.#getPageItems().forEach(item => {
-            this.#keyboard.row().text(this.#renderItem(item));
+            this.#keyboard.row().text(this.#renderItem(item), `itemClick:${this.#resolveItemId(item)}`);
         });
 
         if (this.#totalPages > 1) {

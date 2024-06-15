@@ -1,7 +1,8 @@
 const InlinePaginationKeyboard = require("../keyboards/InlinePaginationKeyboard");
 
 const paginatedResponseKeyboard = new InlinePaginationKeyboard({
-    renderItem: /** @param {import('../../market/Market')} i */ i => `${i.getName()} (${i.getCoin()})`
+    renderItem: /** @param {import('../../market/Market')} i */ i => `${i.getName()} (${i.getCoin()})`,
+    resolveItemId: /** @param {import('../../market/Market')} i */ i => i.getCoin()
 });
 
 module.exports = globalCtx => {
@@ -23,7 +24,7 @@ module.exports = globalCtx => {
 
         paginatedResponseKeyboard.setItems(markets);
 
-        await ctx.reply(`Found ${markets.length} coin(s):`, {
+        await ctx.reply(`Found ${markets.length} coin(s). Select one for details and further actions:`, {
             reply_markup: paginatedResponseKeyboard.getMarkup()
         });
     };
