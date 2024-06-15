@@ -60,8 +60,20 @@ class InlinePaginationKeyboard {
 
     init(bot) {
         bot.on("callback_query:data", async (ctx) => {
-            console.log("Unknown button event with payload", ctx.callbackQuery.data);
-            await ctx.answerCallbackQuery(); // remove loading animation
+            if (ctx.callbackQuery.data.includes('pagination:')) {
+                const [, page] = ctx.callbackQuery.data.split(':');
+                const pageNumber = parseInt(page);
+
+                if (pageNumber !== this.#currentPage) {
+                    this.#setCurrent(pageNumber);
+
+                    ctx.editMessageReplyMarkup({
+                        reply_markup: this.getMarkup()
+                    });
+                }
+            }
+
+            await ctx.answerCallbackQuery();
         });
 
         return this;
@@ -71,6 +83,7 @@ class InlinePaginationKeyboard {
      * @param {Item[]} items
      */
     setItems(items) {
+        this.#currentPage = 0;
         this.#items = items;
         this.#totalItems = items.length - 1;
         this.#totalPages = Math.ceil(this.#totalItems/this.#perPage);
@@ -80,23 +93,8 @@ class InlinePaginationKeyboard {
         return this.#items.slice(this.#currentPage, this.#currentPage + this.#perPage);
     }
 
-    firstPage() {
-
-        return this;
-    }
-
-    nextPage() {
-
-        return this;
-    }
-
-    prevPage() {
-
-        return this;
-    }
-
-    lastPage() {
-
+    #setCurrent(page) {
+        this.#currentPage = page;
         return this;
     }
 
@@ -104,7 +102,7 @@ class InlinePaginationKeyboard {
         const pagination = [];
         const current = this.#currentPage + 1;
 
-        if (current > 1) {
+        if (current > Math.ceil(this.#maxVisiblePages / 2)) {
             pagination.push({
                 type: 'first',
                 page: 1
@@ -125,7 +123,7 @@ class InlinePaginationKeyboard {
             });
         }
 
-        if (current < this.#totalPages) {
+        if (this.#totalPages - current > Math.floor(this.#maxVisiblePages / 2)) {
             pagination.push({
                 type: 'last',
                 page: this.#totalPages
@@ -151,13 +149,13 @@ class InlinePaginationKeyboard {
             this.#keyboard.row();
             pagination.forEach(p => {
                 if (p.type === 'first')
-                    this.#keyboard.text('« 1');
+                    this.#keyboard.text('« 1', 'pagination:0');
 
                 if (p.type === 'last')
-                    this.#keyboard.text(`${this.#totalPages} »`);
+                    this.#keyboard.text(`${this.#totalPages} »`, `pagination:${this.#totalPages - 1}`);
 
                 if (p.type === 'page')
-                    this.#keyboard.text(p.page);
+                    this.#keyboard.text(p.current ? `[${p.page}]` : `${p.page}`, `pagination:${p.page - 1}`);
             });
         }
 
