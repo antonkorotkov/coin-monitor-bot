@@ -1,4 +1,4 @@
-const { Bot, session } = require('grammy');
+const { Bot, session, GrammyError, HttpError } = require('grammy');
 const { I18n } = require("@grammyjs/i18n");
 const { conversations, createConversation } = require('@grammyjs/conversations');
 
@@ -23,9 +23,17 @@ const initialize = () => {
 
     marketsCollection.refresh();
 
-    bot.catch = err => {
-        console.error('ERROR', err);
-    };
+    bot.catch(({ ctx, error }) => {
+        console.error(`Error while handling update ${ctx.update.update_id}:`);
+
+        if (error instanceof GrammyError) {
+            console.error("Error in request:", error.description);
+        } else if (error instanceof HttpError) {
+            console.error("Could not contact Telegram:", error);
+        } else {
+            console.error("Unknown error:", error);
+        }
+    });
 
     bot.use(logger);
     bot.use(i18n);

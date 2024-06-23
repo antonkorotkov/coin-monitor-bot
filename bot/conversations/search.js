@@ -1,22 +1,46 @@
 const InlinePaginationKeyboard = require("../keyboards/InlinePaginationKeyboard");
+const MarketDetailsKeyboard = require("../keyboards/MarketDetailsKeyboard");
 
 const paginatedResponseKeyboard = new InlinePaginationKeyboard({
     renderItem: /** @param {import('../../market/Market')} i */ i => `${i.getName()} (${i.getCoin()})`,
     resolveItemId: /** @param {import('../../market/Market')} i */ i => i.getCoin()
 });
+const marketDetailsKeyboard = new MarketDetailsKeyboard();
 
 module.exports = globalCtx => {
-    paginatedResponseKeyboard.init(globalCtx.bot, async (coin, ctx) => {
+
+    /**
+     * @param {string} coin
+     * @param {import('grammy').CallbackQueryContext} ctx
+     */
+    const onPaginatedItemClick = async (coin, ctx) => {
         const market = globalCtx.marketsCollection.getMarketByCoin(coin);
 
         if (!market)
-            return await ctx.reply('Currency not found or not available anymore');
+            return await ctx.reply(ctx.t('coin_not_found'));
 
-        await ctx.reply(market.getPrice());
-    });
+        marketDetailsKeyboard.setContext(ctx);
+        marketDetailsKeyboard.setMarket(market);
+
+        await ctx.reply(ctx.t(...marketDetailsKeyboard.getMessage()), {
+            parse_mode: 'HTML',
+            reply_markup: await marketDetailsKeyboard.getMarkup()
+        });
+    }
+
+    const onAddMonitor = (coin, ctx) => {
+        ctx.reply(`Add Monitor for ${coin}`);
+    };
+
+    const onShowMonitor = (coin, ctx) => {
+        ctx.reply(`Show Monitor for ${coin}`);
+    };
+
+    marketDetailsKeyboard.init(globalCtx.bot, { onAddMonitor, onShowMonitor });
+    paginatedResponseKeyboard.init(globalCtx.bot, { onItemClick: onPaginatedItemClick });
 
     return async function searchConversation(conversation, ctx) {
-        await ctx.reply('Enter the name or code of the crypto currency to search for:');
+        await ctx.reply(ctx.t('search_wait'));
         const { msg: { text } } = await conversation.waitFor("message:text");
 
         /**
@@ -25,13 +49,13 @@ module.exports = globalCtx => {
         const markets = globalCtx.marketsCollection.findMarkets(text);
 
         if (markets.length === 0) {
-            await ctx.reply('Nothing found');
+            await ctx.reply(ctx.t('nothing_found'));
             return;
         }
 
         paginatedResponseKeyboard.setItems(markets);
 
-        await ctx.reply(`Found ${markets.length} coin(s). Select one for details and further actions:`, {
+        await ctx.reply(ctx.t('found', { number: markets.length }), {
             reply_markup: paginatedResponseKeyboard.getMarkup()
         });
     };

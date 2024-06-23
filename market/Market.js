@@ -1,3 +1,7 @@
+const round = num => {
+    return Math.ceil(num * 1000000) / 1000000;
+}
+
 module.exports = class Market {
     /** @type {string} */
     #coin;
@@ -14,7 +18,7 @@ module.exports = class Market {
     /** @type {number} */
     #volume;
 
-    /** @type {Date} */
+    /** @type {number} */
     #lastUpdated;
 
     /**
@@ -28,7 +32,7 @@ module.exports = class Market {
         this.#name = marketData.Name;
         this.#price = marketData.Price;
         this.#volume = marketData.Volume_24h;
-        this.#lastUpdated = new Date(marketData.Timestamp);
+        this.#lastUpdated = (marketData.Timestamp - 3600) * 1000;
     }
 
     getCoin() {
@@ -39,11 +43,17 @@ module.exports = class Market {
         return this.#fiat;
     }
 
-    getPrice() {
+    getPrice(doRound = false) {
+        if (doRound)
+            return round(this.#price);
+
         return this.#price;
     }
 
-    getVolume() {
+    getVolume(doRound = false) {
+        if (doRound)
+            return round(this.#volume);
+
         return this.#volume;
     }
 

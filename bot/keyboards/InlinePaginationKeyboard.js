@@ -8,11 +8,6 @@ const { InlineKeyboard } = require("grammy");
 class InlinePaginationKeyboard {
 
     /**
-     * @type {InlineKeyboard}
-     */
-    #keyboard;
-
-    /**
      * @type {Item[]}
      */
     #items;
@@ -64,8 +59,12 @@ class InlinePaginationKeyboard {
         this.#maxVisiblePages = maxVisiblePages;
     }
 
-    init(bot, onItemClick) {
-        bot.on("callback_query:data", async (ctx) => {
+    /**
+     * @param {import('grammy').Bot} bot
+     * @param {{ onItemClick: (itemId: string, ctx: import('grammy').Context) }} options
+     */
+    init(bot, { onItemClick }) {
+        bot.on("callback_query:data", async (ctx, next) => {
             if (ctx.callbackQuery.data.includes('pagination:')) {
                 const [, page] = ctx.callbackQuery.data.split(':');
                 const pageNumber = parseInt(page);
@@ -84,9 +83,8 @@ class InlinePaginationKeyboard {
             }
 
             await ctx.answerCallbackQuery();
+            await next();
         });
-
-        return this;
     }
 
     /**
@@ -148,29 +146,29 @@ class InlinePaginationKeyboard {
      * @returns {InlineKeyboard}
      */
     getMarkup() {
-        this.#keyboard = new InlineKeyboard();
+        const keyboard = new InlineKeyboard();
 
         this.#getPageItems().forEach(item => {
-            this.#keyboard.row().text(this.#renderItem(item), `itemClick:${this.#resolveItemId(item)}`);
+            keyboard.row().text(this.#renderItem(item), `itemClick:${this.#resolveItemId(item)}`);
         });
 
         if (this.#totalPages > 1) {
             const pagination = this.#generatePagination();
 
-            this.#keyboard.row();
+            keyboard.row();
             pagination.forEach(p => {
                 if (p.type === 'first')
-                    this.#keyboard.text('« 1', 'pagination:0');
+                    keyboard.text('« 1', 'pagination:0');
 
                 if (p.type === 'last')
-                    this.#keyboard.text(`${this.#totalPages} »`, `pagination:${this.#totalPages - 1}`);
+                    keyboard.text(`${this.#totalPages} »`, `pagination:${this.#totalPages - 1}`);
 
                 if (p.type === 'page')
-                    this.#keyboard.text(p.current ? `[${p.page}]` : `${p.page}`, `pagination:${p.page - 1}`);
+                    keyboard.text(p.current ? `[${p.page}]` : `${p.page}`, `pagination:${p.page - 1}`);
             });
         }
 
-        return this.#keyboard;
+        return keyboard;
     }
 }
 

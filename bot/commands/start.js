@@ -3,7 +3,7 @@ const User = require("../../db/schemas/User");
 const start = async ctx => {
     await User.createOrUpdate({
         telegramId: ctx.chat.id,
-        username: ctx.chat.username,
+        nickname: ctx.chat.username,
         firstName: ctx.chat.first_name,
         lastName: ctx.chat.last_name
     });
