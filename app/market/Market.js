@@ -1,6 +1,4 @@
-const round = num => {
-    return Math.ceil(num * 1000000) / 1000000;
-}
+const round = require("../utils/round");
 
 module.exports = class Market {
     /** @type {string} */
