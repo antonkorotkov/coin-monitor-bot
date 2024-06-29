@@ -4,7 +4,7 @@
     "description": "Telegram Bot for monitoring crypto coins prices",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "mocha **/*.test.js",
         "start": "DEBUG=* node ./index.js"
     },
     "author": "Anton Korotkov",
@@ -18,5 +18,9 @@
         "grammy": "^1.24.1",
         "moment": "^2.30.1",
         "mongoose": "^8.4.1"
+    },
+    "devDependencies": {
+        "expect": "^29.7.0",
+        "mocha": "^10.5.2"
     }
 }
