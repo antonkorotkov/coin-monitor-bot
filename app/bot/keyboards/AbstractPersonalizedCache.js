@@ -15,8 +15,7 @@ class AbstractPersonalizedCache {
         if (!this.#cache[userId])
             this.#cache[userId] = {};
 
-        if (typeof this.#cache[userId][entityName] === 'undefined')
-            this.#cache[userId][entityName] = structuredClone(data);
+        this.#cache[userId][entityName] = data;
 
         return this;
     }

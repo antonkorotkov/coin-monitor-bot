@@ -3,14 +3,14 @@ class App {
     #mongoose;
     #log;
     #marketsService;
-    #bot;
+    #telegramBot;
 
     constructor(options) {
         this.#mongoose = options.mongoose;
         this.#db = options.db;
         this.#log = options.logger.debug(this.constructor.name);
         this.#marketsService = options.marketsService;
-        this.#bot = options.bot;
+        this.#telegramBot = options.telegramBot;
 
         this.#log('Initializing...');
     }
@@ -23,7 +23,7 @@ class App {
                 this.#log(changed.length);
             });
 
-            this.#bot.start();
+            this.#telegramBot.start();
         });
 
         await this.#db();

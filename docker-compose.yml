@@ -1,0 +1,53 @@
+version: '3'
+services:
+  rabbitmq:
+    container_name: RabbitMQ
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: MongoDB
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    container_name: TelegramBot
+    depends_on:
+      - mongodb
+      - rabbitmq
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      DB_CONNECTION_STRING:
+      BOT_TOKEN:
+      WCI_KEY:
+    networks:
+      - app-network
+
+  # worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     RABBITMQ_URL: amqp://rabbitmq
+  #   networks:
+  #     - app-network
+  #   deploy:
+  #     replicas: 3
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:

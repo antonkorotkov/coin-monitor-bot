@@ -30,7 +30,7 @@ module.exports = class Market {
         this.#name = marketData.Name;
         this.#price = marketData.Price;
         this.#volume = marketData.Volume_24h;
-        this.#lastUpdated = (marketData.Timestamp - 3600) * 1000;
+        this.#lastUpdated = marketData.Timestamp * 1000;
     }
 
     getCoin() {

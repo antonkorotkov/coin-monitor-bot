@@ -12,18 +12,24 @@ describe('AbstractPersonalizedCache', () => {
 
     it('should store user cache entity', () => {
         expect(() => {
-            cache.setUserCacheEntity(1, 'key', [1, 2, 3])
+            cache.setUserCacheEntity(1, 'key', [1, 2, 3]);
         }).not.toThrow();
-    })
+    });
+
+    it('should update user cache entity', () => {
+        expect(() => {
+            cache.setUserCacheEntity(1, 'key', [4, 5, 6]);
+        }).not.toThrow();
+    });
 
     it('should return user cache', () => {
         const userCache = cache.getUserCache(1);
-        expect(userCache).toHaveProperty('key', [1, 2, 3]);
+        expect(userCache).toHaveProperty('key', [4, 5, 6]);
     });
 
     it('should return user cache entity', () => {
         const userCache = cache.getUserCache(1, 'key');
-        expect(userCache).toEqual([1, 2, 3]);
+        expect(userCache).toEqual([4, 5, 6]);
     });
 
     it('should flush user cache entity', () => {
