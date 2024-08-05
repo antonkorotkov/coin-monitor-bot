@@ -14,16 +14,21 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 18
         cache: 'npm'
-    - run: npm ci
-    - run: npm test
+        cache-dependency-path: '**/package-lock.json'
+
+    - name: Install
+      run: npm ci
+      working-directory: ./app
+
+    - name: Test
+      run: npm test
+      working-directory: ./app
