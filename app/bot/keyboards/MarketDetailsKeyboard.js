@@ -11,9 +11,15 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
      */
     init(bot, { onAddMonitor, onShowMonitor }) {
         bot.on("callback_query:data", async (ctx, next) => {
-            if (ctx.callbackQuery.data.includes('addMonitor:')) {
-                const [, coin] = ctx.callbackQuery.data.split(':');
-                await onAddMonitor(coin, ctx);
+            if (ctx.callbackQuery.data.includes('addMonitor')) {
+                if (!this.#canAddMonitor(ctx.chat.id))
+                    return await ctx.reply('You cannot add more than 5 monitors.');
+
+                const market = this.#getMarket(ctx.chat.id);
+                if (!market)
+                    return await ctx.reply('Oops... Looks like you were thinking for too long. Try again from search.');
+
+                await onAddMonitor(market.getId(), market.getCoin(), market.getPrice(true), ctx);
             }
 
             if (ctx.callbackQuery.data.includes('showMonitor:')) {
@@ -29,8 +35,24 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
      * @param {number} userId
      * @param {import('../../market/Market')} market
      */
-    setMarket(userId, market) {
+    async setMarket(userId, market) {
+        const userMonitors = await Monitor.find({ telegramId: userId });
+        this.setUserCacheEntity(userId, 'can_add_monitor', userMonitors.length < 5);
+
+        const existingMonitor = userMonitors.find(m => m.coinId === market.getId());
+        if (existingMonitor)
+            this.setUserCacheEntity(userId, 'market_monitor', existingMonitor);
+        else
+            this.flushUserCache(userId, 'market_monitor');
+
         return this.setUserCacheEntity(userId, 'market_details', market);
+    }
+
+    /**
+     * @param {string} userId
+     */
+    getMarketMonitor(userId) {
+        return this.getUserCache(userId, 'market_monitor');
     }
 
     /**
@@ -39,6 +61,10 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
      */
     #getMarket(userId) {
         return this.getUserCache(userId, 'market_details');
+    }
+
+    #canAddMonitor(userId) {
+        return this.getUserCache(userId, 'can_add_monitor');
     }
 
     /**
@@ -50,15 +76,26 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
             return undefined;
 
         const updated = moment(market.getLastUpdated());
+        const monitor = this.getMarketMonitor(userId);
 
-        return ['market_message', {
+        const messageParams = {
             name: market.getName(),
             coin: market.getCoin(),
             price: Intl.NumberFormat().format(market.getPrice(true)),
             fiat: market.getFiat(),
             volume: truncate(market.getVolume(true)),
             last_update: updated.from(moment())
-        }];
+        };
+
+        if (monitor) {
+            const monitorMessageParams = {
+                monitor_type: monitor.threshold.type === 'percentage' ? '%' : '$',
+                monitor_value: monitor.threshold.value
+            };
+            return ['market_message_monitor', { ...messageParams, ...monitorMessageParams }];
+        }
+
+        return ['market_message', messageParams];
     }
 
     /**
@@ -70,14 +107,14 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
         if (!market)
             return undefined;
 
-        const existingMonitor = await Monitor.findOne({ coin: market.getCoin(), telegramId: userId });
+        const existingMonitor = this.getMarketMonitor(userId);
         const keyboard = new InlineKeyboard();
         keyboard.row();
 
         if (!existingMonitor)
-            keyboard.text(ctx.t('add_monitor'), `addMonitor:${market.getCoin()}`);
+            keyboard.text(ctx.t('add_monitor'), 'addMonitor');
         else
-            keyboard.text(ctx.t('show_monitor'), `showMonitor:${existingMonitor._id}`);
+            keyboard.text(ctx.t('delete_monitor'), `deleteMonitor:${existingMonitor._id}`);
 
         return keyboard;
     }

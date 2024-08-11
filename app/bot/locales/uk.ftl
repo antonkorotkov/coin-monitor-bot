@@ -12,10 +12,33 @@ found = Знайдено криптовалют: { $number }. Виберіть �
 market_message =
     <b>{ $name } ({ $coin })</b>
 
-    💵 <b>Ціна:</b> <code>{ $price } { $fiat }</code>
-    📈 <b>24H Обʼєм:</b> <code>{ $volume } { $fiat }</code>
-    📅 <b>Оновлено:</b> <code>{ $last_update }</code>
+    <b>Ціна:</b> <code>{ $price } { $fiat }</code>
+    <b>24H Обʼєм:</b> <code>{ $volume } { $fiat }</code>
+    <b>Оновлено:</b> <code>{ $last_update }</code>
+
+market_message_monitor =
+    <b>{ $name } ({ $coin })</b>
+
+    <b>Ціна:</b> <code>{ $price } { $fiat }</code>
+    <b>24H Обʼєм:</b> <code>{ $volume } { $fiat }</code>
+    <b>Оновлено:</b> <code>{ $last_update }</code>
+
+    <b>Моніторінг:</b> <code>±{ $monitor_value }{ $monitor_type }</code>
 
 add_monitor = Додати Монітор
 
-show_monitor = Показати Монітор
+delete_monitor = Видалити Монітор
+
+use_buttons_alert = Використовуйте кнопки!
+
+monitor_type_fixed = Фіксований
+
+monitor_type_percentage = Відсотки
+
+monitor_type_prompt = Оберіть тип зміни ціни для моніторінгу:
+
+monitor_threshold_prompt = Вкажіть поріг зміни ціни ({ $type }):
+
+monitor_number_validation = Тільки числа, наприклад <code>12</code> або <code>1.4</code>. Максимум: 1,000,000
+
+monitor_created = Монітор успішно створений.

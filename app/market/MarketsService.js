@@ -2,7 +2,7 @@ const round = require("../utils/round");
 const Market = require("./Market");
 
 const apiUrl = 'https://www.worldcoinindex.com/apiservice/v2getmarkets';
-const fetchInterval = 60_000;
+const fetchInterval = 300_000;
 
 class MarketsService {
     #log;
@@ -79,8 +79,8 @@ class MarketsService {
         );
     }
 
-    getMarketByCoin(coin) {
-        return this.#markets.find(m => m.getCoin() === coin);
+    getMarketById(id) {
+        return this.#markets.find(m => m.getId() === id);
     }
 }
 

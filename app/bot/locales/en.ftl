@@ -12,10 +12,33 @@ found = Found { $number } coin(s). Select one for details and further actions:
 market_message =
     <b>{ $name } ({ $coin })</b>
 
-    💵 <b>Price:</b> <code>{ $price } { $fiat }</code>
-    📈 <b>24H Volume:</b> <code>{ $volume } { $fiat }</code>
-    📅 <b>Last Update:</b> <code>{ $last_update }</code>
+    <b>Price:</b> <code>{ $price } { $fiat }</code>
+    <b>24H Volume:</b> <code>{ $volume } { $fiat }</code>
+    <b>Last Update:</b> <code>{ $last_update }</code>
+
+market_message_monitor =
+    <b>{ $name } ({ $coin })</b>
+
+    <b>Price:</b> <code>{ $price } { $fiat }</code>
+    <b>24H Volume:</b> <code>{ $volume } { $fiat }</code>
+    <b>Last Update:</b> <code>{ $last_update }</code>
+
+    <b>Monitor:</b> <code>±{ $monitor_value }{ $monitor_type }</code>
 
 add_monitor = Add Monitor
 
-show_monitor = Show Monitor
+delete_monitor = Delete Monitor
+
+use_buttons_alert = Use the buttons!
+
+monitor_type_fixed = Fixed
+
+monitor_type_percentage = Percentage
+
+monitor_type_prompt = Select the type of price change to monitor:
+
+monitor_threshold_prompt = Enter the price change threshold ({ $type }):
+
+monitor_number_validation = Only numbers, e.g. <code>12</code> or <code>1.4</code>. Max: 1,000,000
+
+monitor_created = Monitor successfully created.

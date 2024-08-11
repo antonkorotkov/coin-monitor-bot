@@ -7,6 +7,10 @@ const MonitorSchema = new Schema({
         immutable: true,
         required: true
     },
+    coinId: {
+        type: String,
+        required: true
+    },
     coin: {
         type: String,
         required: true
@@ -22,10 +26,21 @@ const MonitorSchema = new Schema({
         },
         type: {
             type: String,
-            enum: ['percent', 'fixed']
+            enum: ['percentage', 'fixed'],
+            required: true
         }
     }
 });
+
+MonitorSchema.statics.createOrUpdate = function ({
+    telegramId, coinId, ...data
+}) {
+    return this.findOneAndUpdate(
+        { telegramId, coinId },
+        { $set: data },
+        { new: true, upsert: true }
+    );
+};
 
 const Monitor = model('Monitor', MonitorSchema);
 

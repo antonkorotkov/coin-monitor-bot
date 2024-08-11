@@ -47,13 +47,13 @@ class AbstractPersonalizedCache {
         if (!this.#cache[userId])
             return this;
 
-        if (entityName && this.#cache[userId][entityName]) {
-            this.#cache[userId][entityName] = undefined;
-
+        if (!entityName) {
+            this.#cache[userId] = undefined;
             return this;
         }
 
-        this.#cache[userId] = undefined;
+        if (this.#cache[userId][entityName])
+            this.#cache[userId][entityName] = undefined;
 
         return this;
     }
