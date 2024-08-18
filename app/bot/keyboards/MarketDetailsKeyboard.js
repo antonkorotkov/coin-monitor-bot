@@ -9,7 +9,7 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
     /**
      * @param {import('grammy').Bot} bot
      */
-    init(bot, { onAddMonitor, onShowMonitor }) {
+    init(bot, { onAddMonitor, onDeleteMonitor }) {
         bot.on("callback_query:data", async (ctx, next) => {
             if (ctx.callbackQuery.data.includes('addMonitor')) {
                 if (!this.#canAddMonitor(ctx.chat.id))
@@ -22,9 +22,9 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
                 await onAddMonitor(market.getId(), market.getCoin(), market.getPrice(true), ctx);
             }
 
-            if (ctx.callbackQuery.data.includes('showMonitor:')) {
-                const [, id] = ctx.callbackQuery.data.split(':');
-                await onShowMonitor(id, ctx);
+            if (ctx.callbackQuery.data.includes('deleteMonitor')) {
+                const monitor = this.getMarketMonitor(ctx.chat.id);
+                await onDeleteMonitor(monitor, ctx);
             }
 
             await next();
@@ -114,7 +114,7 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
         if (!existingMonitor)
             keyboard.text(ctx.t('add_monitor'), 'addMonitor');
         else
-            keyboard.text(ctx.t('delete_monitor'), `deleteMonitor:${existingMonitor._id}`);
+            keyboard.text(ctx.t('delete_monitor'), 'deleteMonitor');
 
         return keyboard;
     }

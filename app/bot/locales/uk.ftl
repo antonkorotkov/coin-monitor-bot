@@ -42,3 +42,9 @@ monitor_threshold_prompt = Вкажіть поріг зміни ціни ({ $typ
 monitor_number_validation = Тільки числа, наприклад <code>12</code> або <code>1.4</code>. Максимум: 1,000,000
 
 monitor_created = Монітор успішно створений.
+
+monitor_deleted = Монитор було видалено.
+
+monitor_bad_threshold = Неможливо створити монітор з таким значенням порогу.
+
+are_you_sure = Ви впевнені?

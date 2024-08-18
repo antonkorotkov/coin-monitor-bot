@@ -42,3 +42,9 @@ monitor_threshold_prompt = Enter the price change threshold ({ $type }):
 monitor_number_validation = Only numbers, e.g. <code>12</code> or <code>1.4</code>. Max: 1,000,000
 
 monitor_created = Monitor successfully created.
+
+monitor_deleted = Monitor has been deleted.
+
+monitor_bad_threshold = Cannot create monitor with this threshold value.
+
+are_you_sure = Are you sure?

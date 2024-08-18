@@ -6,7 +6,7 @@ const TYPE_PERCENTAGE = 'percentage';
 const CONFIRM_CREATE = 'create';
 const CONFIRM_CANCEL = 'cancel';
 
-module.exports = ({ logger }) => bot => {
+module.exports = ({ logger }) => _ => {
     return async function addMonitorConversation(conversation, ctx) {
         const typeKeyboard = new InlineKeyboard();
         typeKeyboard.text(ctx.t('monitor_type_fixed'), TYPE_FIXED).text(ctx.t('monitor_type_percentage'), TYPE_PERCENTAGE);
@@ -28,11 +28,11 @@ module.exports = ({ logger }) => bot => {
         );
 
         if (value <= 0 || value > 1_000_000)
-            return await ctx.reply('Cannot create monitor with this value');
+            return await ctx.reply(ctx.t('monitor_bad_threshold'));
 
         const confirmationKeyboard = new InlineKeyboard();
         confirmationKeyboard.text('Create', CONFIRM_CREATE).text('Cancel', CONFIRM_CANCEL);
-        await ctx.reply(`You are about to create a <b>${monitorTypeCtx.match}</b> price monitor for <code>${ctx.state.coin}</code> with the threshold of ${value}${monitorTypeCtx.match === TYPE_PERCENTAGE ? '%' : ''}`, {
+        await ctx.reply(`You are about to create a <b>${monitorTypeCtx.match}</b> price monitor for <code>${ctx.state.coin}</code> with the threshold of ${value}${monitorTypeCtx.match === TYPE_PERCENTAGE ? '%' : '$'}`, {
             parse_mode: 'HTML',
             reply_markup: confirmationKeyboard
         });
@@ -60,7 +60,7 @@ module.exports = ({ logger }) => bot => {
         } catch (err) {
             logger.debug('addMonitor')(err);
 
-            await ctx.reply('Sorry, there was an error on our side. Please try again later or contact administrator.')
+            await ctx.reply('Sorry, there was an error on our side. Please try again later or contact administrator.');
         }
     };
 };

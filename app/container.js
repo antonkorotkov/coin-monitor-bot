@@ -5,8 +5,9 @@ const logger = require('./logger');
 const { connectToDatabase, mongoose } = require('./db/database');
 const App = require('./app');
 const MarketsService = require('./market/MarketsService');
+const MarketChangesService = require('./market/MarketChangesService');
 const TelegramBot = require('./bot/TelegramBot');
-const { searchConversation, addMonitorConversation } = require('./bot/conversations');
+const { searchConversation, addMonitorConversation, deleteMonitorConversation } = require('./bot/conversations');
 const InlinePaginationKeyboard = require('./bot/keyboards/InlinePaginationKeyboard');
 const MarketDetailsKeyboard = require('./bot/keyboards/MarketDetailsKeyboard');
 
@@ -21,9 +22,11 @@ container.register({
     db: asFunction(connectToDatabase).singleton(),
     app: asClass(App),
     marketsService: asClass(MarketsService).singleton(),
+    marketChangesService: asClass(MarketChangesService).singleton(),
     telegramBot: asClass(TelegramBot).singleton(),
     conversationSearch: asFunction(searchConversation).singleton(),
     conversationAddMonitor: asFunction(addMonitorConversation).singleton(),
+    conversationDeleteMonitor: asFunction(deleteMonitorConversation).singleton(),
     inlinePaginationKeyboard: asClass(InlinePaginationKeyboard).singleton(),
     marketDetailsKeyboard: asClass(MarketDetailsKeyboard).singleton()
 });

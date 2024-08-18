@@ -29,14 +29,21 @@ module.exports = options => bot => {
 
     const onAddMonitor = async (id, coin, price, ctx) => {
         ctx.state = { id, coin, price };
-        await ctx.conversation.enter('addMonitorConversation');
+        const stats = await ctx.conversation.active();
+
+        if (!Object.keys(stats).length)
+            await ctx.conversation.enter('addMonitorConversation');
     };
 
-    const onShowMonitor = (coin, ctx) => {
-        ctx.reply(`Show Monitor for ${coin}`);
+    const onDeleteMonitor = async (monitor, ctx) => {
+        ctx.state = { id: monitor?.id };
+        const stats = await ctx.conversation.active();
+
+        if (!Object.keys(stats).length)
+            await ctx.conversation.enter('deleteMonitorConversation');
     };
 
-    marketDetails.init(bot, { onAddMonitor, onShowMonitor });
+    marketDetails.init(bot, { onAddMonitor, onDeleteMonitor });
     pagination.init(bot, {
         onItemClick,
         renderItem: i => `${i.getName()} (${i.getCoin()})`,

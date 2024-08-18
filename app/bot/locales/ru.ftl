@@ -42,3 +42,9 @@ monitor_threshold_prompt = Укажите порог изменения цены
 monitor_number_validation = Только числа, например <code>12</code> или <code>1.4</code>. Максимум: 1,000,000
 
 monitor_created = Монитор успешно создан.
+
+monitor_deleted = Монитор удален.
+
+monitor_bad_threshold = Невозможно создать монитор с таким значением порога.
+
+are_you_sure = Вы уверены?
