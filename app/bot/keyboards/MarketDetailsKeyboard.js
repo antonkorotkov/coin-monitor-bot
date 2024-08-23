@@ -19,7 +19,7 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
                 if (!market)
                     return await ctx.reply('Oops... Looks like you were thinking for too long. Try again from search.');
 
-                await onAddMonitor(market.getId(), market.getCoin(), market.getPrice(true), ctx);
+                await onAddMonitor(market.getId(), market.getCoin(), market.getPrice(true), market.getName(), ctx);
             }
 
             if (ctx.callbackQuery.data.includes('deleteMonitor')) {

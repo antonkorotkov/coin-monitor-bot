@@ -15,6 +15,10 @@ const MonitorSchema = new Schema({
         type: String,
         required: true
     },
+    coinName: {
+        type: String,
+        required: true
+    },
     lastPrice: {
         type: Number,
         required: true

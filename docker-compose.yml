@@ -3,46 +3,83 @@ services:
     container_name: RabbitMQ
     image: rabbitmq:management
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "15677:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER:
+      RABBITMQ_DEFAULT_PASS:
     networks:
       - app-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: 3
 
   mongodb:
     image: mongo:latest
     container_name: MongoDB
     ports:
-      - "27017:27017"
+      - "27077:27017"
     networks:
       - app-network
     volumes:
       - mongo-data:/data/db
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: 3
 
   app:
     container_name: TelegramBot
     depends_on:
-      - mongodb
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
     build:
       context: ./app
       dockerfile: Dockerfile
     environment:
       DB_CONNECTION_STRING:
+      AMQP_CONNECTION_STRING:
       BOT_TOKEN:
       WCI_KEY:
     networks:
       - app-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: 3
 
-  # worker:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     RABBITMQ_URL: amqp://rabbitmq
-  #   networks:
-  #     - app-network
-  #   deploy:
-  #     replicas: 3
+  worker:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    environment:
+      AMQP_CONNECTION_STRING:
+      DB_CONNECTION_STRING:
+      API_TOKEN:
+    networks:
+      - app-network
+    deploy:
+      replicas: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: 3
 
 networks:
   app-network:

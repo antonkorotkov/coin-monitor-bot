@@ -27,8 +27,8 @@ module.exports = options => bot => {
         });
     }
 
-    const onAddMonitor = async (id, coin, price, ctx) => {
-        ctx.state = { id, coin, price };
+    const onAddMonitor = async (id, coin, price, name, ctx) => {
+        ctx.state = { id, coin, price, name };
         const stats = await ctx.conversation.active();
 
         if (!Object.keys(stats).length)

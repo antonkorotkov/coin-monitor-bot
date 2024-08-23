@@ -49,6 +49,7 @@ module.exports = ({ logger }) => _ => {
                 telegramId: ctx.chat.id,
                 coinId: ctx.state.id,
                 coin: ctx.state.coin,
+                coinName: ctx.state.name,
                 lastPrice: ctx.state.price,
                 threshold: {
                     type: monitorTypeCtx.match,

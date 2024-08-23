@@ -15,6 +15,10 @@ const MonitorSchema = new Schema({
         type: String,
         required: true
     },
+    coinName: {
+        type: String,
+        required: true
+    },
     lastPrice: {
         type: Number,
         required: true
@@ -32,14 +36,46 @@ const MonitorSchema = new Schema({
     }
 });
 
-MonitorSchema.statics.createOrUpdate = function ({
-    telegramId, coinId, ...data
-}) {
-    return this.findOneAndUpdate(
-        { telegramId, coinId },
-        { $set: data },
-        { new: true, upsert: true }
-    );
+/**
+ * @param {{ type: 'percentage' | 'fixed', value: number }} threshold
+ * @param {number} lastPrice
+ * @returns {number}
+ */
+const getExpectedDiff = ({ type, value }, lastPrice) => {
+    if (type === 'fixed')
+        return value;
+
+    if (type === 'percentage') {
+        return lastPrice / 100 * value;
+    }
+
+    return 0;
+};
+
+/**
+ * @param {number} newPrice
+ * @returns {boolean}
+ */
+MonitorSchema.methods.shouldNotify = function (newPrice) {
+    const monitorObject = this.toObject();
+    const expectedDiff = getExpectedDiff(monitorObject.threshold, monitorObject.lastPrice);
+
+    if (!expectedDiff)
+        return false;
+
+    if (Math.abs(newPrice - monitorObject.lastPrice) >= expectedDiff)
+        return true;
+
+    return false;
+};
+
+/**
+ * @param {number} price
+ */
+MonitorSchema.methods.updateLastPrice = function (price) {
+    return this.updateOne({
+        lastPrice: price
+    });
 };
 
 const Monitor = model('Monitor', MonitorSchema);
