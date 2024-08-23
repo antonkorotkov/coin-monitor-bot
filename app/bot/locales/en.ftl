@@ -48,3 +48,13 @@ monitor_deleted = Monitor has been deleted.
 monitor_bad_threshold = Cannot create monitor with this threshold value.
 
 are_you_sure = Are you sure?
+
+delete = Delete
+
+create = Create
+
+cancel = Cancel
+
+add_monitor_confirmation = You are about to create a <b>{ $type }</b> price monitor for <code>{ $coin }</code> with the threshold of <code>{ $value }</code>
+
+monitors_limit = You cannot add more than 5 monitors

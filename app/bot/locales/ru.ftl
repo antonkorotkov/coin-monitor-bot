@@ -48,3 +48,13 @@ monitor_deleted = Монитор удален.
 monitor_bad_threshold = Невозможно создать монитор с таким значением порога.
 
 are_you_sure = Вы уверены?
+
+delete = Удалить
+
+create = Создать
+
+cancel = Отмена
+
+add_monitor_confirmation = Вы собираетесь создать ценовой монитор типа <b>{ $type }</b> для <code>{ $coin }</code> с порогом <code>{ $value }</code>
+
+monitors_limit = Вы не можете иметь больше 5 мониторов

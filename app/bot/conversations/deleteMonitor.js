@@ -13,7 +13,7 @@ module.exports = ({ logger }) => _ => {
             if (!id)
                 return await ctx.reply('Something went wrong. No monitor selected for deletion.');
 
-            confirmationKeyboard.text('Delete', DELETE_CREATE).text('Cancel', CONFIRM_CANCEL);
+            confirmationKeyboard.text(ctx.t('delete'), DELETE_CREATE).text(ctx.t('cancel'), CONFIRM_CANCEL);
             await ctx.reply(ctx.t('are_you_sure'), {
                 reply_markup: confirmationKeyboard
             });

@@ -31,8 +31,8 @@ module.exports = ({ logger }) => _ => {
             return await ctx.reply(ctx.t('monitor_bad_threshold'));
 
         const confirmationKeyboard = new InlineKeyboard();
-        confirmationKeyboard.text('Create', CONFIRM_CREATE).text('Cancel', CONFIRM_CANCEL);
-        await ctx.reply(`You are about to create a <b>${monitorTypeCtx.match}</b> price monitor for <code>${ctx.state.coin}</code> with the threshold of ${value}${monitorTypeCtx.match === TYPE_PERCENTAGE ? '%' : '$'}`, {
+        confirmationKeyboard.text(ctx.t('create'), CONFIRM_CREATE).text(ctx.t('cancel'), CONFIRM_CANCEL);
+        await ctx.reply(ctx.t('add_monitor_confirmation', { type: monitorTypeCtx.match, coin: ctx.state.coin, value: `${value}${monitorTypeCtx.match === TYPE_PERCENTAGE ? '%' : '$'}` }), {
             parse_mode: 'HTML',
             reply_markup: confirmationKeyboard
         });

@@ -13,7 +13,7 @@ class MarketDetailsKeyboard extends AbstractPersonalizedCache {
         bot.on("callback_query:data", async (ctx, next) => {
             if (ctx.callbackQuery.data.includes('addMonitor')) {
                 if (!this.#canAddMonitor(ctx.chat.id))
-                    return await ctx.reply('You cannot add more than 5 monitors.');
+                    return await ctx.reply(ctx.t('monitors_limit'));
 
                 const market = this.#getMarket(ctx.chat.id);
                 if (!market)
