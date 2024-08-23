@@ -2,11 +2,13 @@ const round = require("../utils/round");
 const Market = require("./Market");
 
 const apiUrl = 'https://www.worldcoinindex.com/apiservice/v2getmarkets';
-const fetchInterval = 60_000;
+const fetchInterval = 120_000;
 
 class MarketsService {
     #log;
     #apiKey;
+
+    /** @type {(changes: Array<Market>) => void} */
     #onChange;
     #markets = [];
 
@@ -17,11 +19,15 @@ class MarketsService {
         this.#log('Initializing...');
     }
 
+    /**
+     * @param {(changes: Array<Market>) => void} onChange
+     */
     async watch(onChange) {
         try {
             if (onChange && !this.#onChange)
                 this.#onChange = onChange;
 
+            /** @type {Array<Market>} */
             const changes = [];
             const marketsData = await this.#fetch();
 
@@ -79,8 +85,8 @@ class MarketsService {
         );
     }
 
-    getMarketByCoin(coin) {
-        return this.#markets.find(m => m.getCoin() === coin);
+    getMarketById(id) {
+        return this.#markets.find(m => m.getId() === id);
     }
 }
 

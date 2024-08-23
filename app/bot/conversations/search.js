@@ -4,17 +4,18 @@ module.exports = options => bot => {
     const marketsService = options.marketsService;
 
     /**
-     * @param {string} coin
+     * @param {string} id
      * @param {import('grammy').CallbackQueryContext} ctx
      */
-    const onItemClick = async (coin, ctx) => {
-        const market = marketsService.getMarketByCoin(coin);
+    const onItemClick = async (id, ctx) => {
+        const market = marketsService.getMarketById(id);
 
         if (!market)
             return await ctx.reply(ctx.t('coin_not_found'));
 
         const userId = ctx.from.id;
-        const message = marketDetails.setMarket(userId, market).getMessage(userId);
+        const details = await marketDetails.setMarket(userId, market);
+        const message = details.getMessage(userId);
         const reply_markup = await marketDetails.getMarkup(userId, ctx);
 
         if (!message || !reply_markup)
@@ -26,20 +27,27 @@ module.exports = options => bot => {
         });
     }
 
-    const onAddMonitor = async (coin, ctx) => {
-        ctx.state = { coin };
-        await ctx.conversation.enter('addMonitorConversation');
+    const onAddMonitor = async (id, coin, price, name, ctx) => {
+        ctx.state = { id, coin, price, name };
+        const stats = await ctx.conversation.active();
+
+        if (!Object.keys(stats).length)
+            await ctx.conversation.enter('addMonitorConversation');
     };
 
-    const onShowMonitor = (coin, ctx) => {
-        ctx.reply(`Show Monitor for ${coin}`);
+    const onDeleteMonitor = async (monitor, ctx) => {
+        ctx.state = { id: monitor?.id };
+        const stats = await ctx.conversation.active();
+
+        if (!Object.keys(stats).length)
+            await ctx.conversation.enter('deleteMonitorConversation');
     };
 
-    marketDetails.init(bot, { onAddMonitor, onShowMonitor });
+    marketDetails.init(bot, { onAddMonitor, onDeleteMonitor });
     pagination.init(bot, {
         onItemClick,
         renderItem: i => `${i.getName()} (${i.getCoin()})`,
-        resolveItemId: i => i.getCoin()
+        resolveItemId: i => i.getId()
     });
 
     return async function searchConversation(conversation, ctx) {

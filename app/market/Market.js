@@ -1,6 +1,8 @@
 const round = require("../utils/round");
 
 module.exports = class Market {
+    #id;
+
     /** @type {string} */
     #coin;
 
@@ -25,12 +27,17 @@ module.exports = class Market {
     constructor(marketData) {
         const [coin, fiat] = marketData.Label.split('/');
 
+        this.#id = btoa(`${coin}-${marketData.Name}`);
         this.#coin = coin;
         this.#fiat = fiat;
         this.#name = marketData.Name;
         this.#price = marketData.Price;
         this.#volume = marketData.Volume_24h;
         this.#lastUpdated = marketData.Timestamp * 1000;
+    }
+
+    getId() {
+        return this.#id;
     }
 
     getCoin() {

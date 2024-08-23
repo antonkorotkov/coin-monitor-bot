@@ -24,9 +24,10 @@ class TelegramBot {
         this.#bot.catch(args => this.errorHandler(args));
         this.#bot.use(options.logger.middleware(this.constructor.name));
         this.#bot.use(i18n);
-        this.#bot.use(session({ initial: () => ({}) }));
+        this.#bot.use(session({ initial: () => ({}), type: 'single' }));
         this.#bot.use(conversations());
         this.#bot.use(createConversation(options.conversationAddMonitor(this.#bot)));
+        this.#bot.use(createConversation(options.conversationDeleteMonitor(this.#bot)));
         this.#bot.use(createConversation(options.conversationSearch(this.#bot)));
 
         this.#bot.command('start', start);
