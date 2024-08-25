@@ -46,6 +46,10 @@ MonitorSchema.statics.createOrUpdate = function ({
     );
 };
 
+MonitorSchema.statics.deleteByTelegramId = function (telegramId) {
+    return this.deleteMany({ telegramId });
+};
+
 const Monitor = model('Monitor', MonitorSchema);
 
 module.exports = Monitor;

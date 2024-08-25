@@ -4,6 +4,7 @@ const { Bot, GrammyError, HttpError, session } = require("grammy");
 
 const { start, search } = require("./commands");
 const User = require("../db/schemas/User");
+const Monitor = require("../db/schemas/Monitor");
 
 const i18n = new I18n({
     defaultLocale: "en",
@@ -36,6 +37,7 @@ class TelegramBot {
         this.#bot.on('my_chat_member', async ctx => {
             if (['kicked', 'left'].includes(ctx.myChatMember.new_chat_member.status)) {
                 await User.deactivate(ctx.myChatMember.chat.id);
+                await Monitor.deleteByTelegramId(ctx.myChatMember.chat.id);
                 this.#pagination.flushUserCache(ctx.from.id);
             }
         });
