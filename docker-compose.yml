@@ -18,8 +18,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 1m
-        max-file: 3
+        max-size: 100k
+        max-file: 1
     restart: always
 
   mongodb:
@@ -34,8 +34,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 1m
-        max-file: 3
+        max-size: 100k
+        max-file: 1
     restart: always
 
   app:
@@ -58,8 +58,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 1m
-        max-file: 3
+        max-size: 100k
+        max-file: 1
     restart: always
 
   worker:
@@ -82,8 +82,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: 1m
-        max-file: 3
+        max-size: 100k
+        max-file: 1
     restart: always
 
 networks:
