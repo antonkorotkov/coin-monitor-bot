@@ -20,6 +20,7 @@ services:
       options:
         max-size: 1m
         max-file: 3
+    restart: always
 
   mongodb:
     image: mongo:latest
@@ -35,6 +36,7 @@ services:
       options:
         max-size: 1m
         max-file: 3
+    restart: always
 
   app:
     container_name: TelegramBot
@@ -58,6 +60,7 @@ services:
       options:
         max-size: 1m
         max-file: 3
+    restart: always
 
   worker:
     depends_on:
@@ -81,6 +84,7 @@ services:
       options:
         max-size: 1m
         max-file: 3
+    restart: always
 
 networks:
   app-network:
