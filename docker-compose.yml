@@ -97,7 +97,7 @@ services:
       resources:
         limits:
           cpus: '0.2'
-          memory: 200M
+          memory: 50M
     logging:
       driver: json-file
       options:

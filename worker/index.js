@@ -50,6 +50,7 @@ const start = async () => {
         });
     } catch (error) {
         debug(`Error: ${error.message}`);
+        process.exit(1);
     }
 };
 
@@ -59,3 +60,15 @@ mongoose.connection.once('open', () => {
 });
 
 connectToDatabase(dbConnectionString);
+
+// Catching uncaught exceptions
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught exception: ', err);
+    process.exit(1);
+});
+
+// Catching unhandled promise rejections
+process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled Rejection: ', reason);
+    process.exit(1);
+});
