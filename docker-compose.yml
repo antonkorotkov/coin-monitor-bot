@@ -21,6 +21,11 @@ services:
         max-size: 100k
         max-file: 1
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 200M
 
   mongodb:
     image: mongo:latest
@@ -37,6 +42,11 @@ services:
         max-size: 100k
         max-file: 1
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 200M
 
   app:
     container_name: TelegramBot
@@ -61,6 +71,11 @@ services:
         max-size: 100k
         max-file: 1
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
 
   worker:
     depends_on:
@@ -78,7 +93,11 @@ services:
     networks:
       - app-network
     deploy:
-      replicas: 3
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 200M
     logging:
       driver: json-file
       options:
